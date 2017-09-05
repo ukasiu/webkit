@@ -156,6 +156,7 @@ JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef group, JSClass
     if (JSRemoteInspectorGetInspectionEnabledByDefault())
         globalObject->setRemoteDebuggingEnabled(true);
 #endif
+    JSRemoteInspectorStart();
     return JSGlobalContextRetain(toGlobalRef(exec));
 }
 

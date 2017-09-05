@@ -30,6 +30,9 @@
 #include <wtf/Forward.h>
 #include <wtf/HashMap.h>
 #include <wtf/Lock.h>
+#include <plist/Dictionary.h>
+#include <plist/Boolean.h>
+
 
 #if PLATFORM(COCOA)
 #include "RemoteInspectorXPCConnection.h"
@@ -48,6 +51,13 @@ typedef struct _GDBusConnection GDBusConnection;
 typedef struct _GDBusInterfaceVTable GDBusInterfaceVTable;
 #endif
 
+// TCPPlist
+typedef std::shared_ptr<PList::Dictionary> TargetListing;
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <plist/Dictionary.h>
+#include <inspector/remote/tcpplist/RemoteInspectorTCPServer.h>
+
 namespace Inspector {
 
 class RemoteAutomationTarget;
@@ -60,7 +70,8 @@ class JS_EXPORT_PRIVATE RemoteInspector final
 #if PLATFORM(COCOA)
     : public RemoteInspectorXPCConnection::Client
 #endif
-{
+: public RemoteInspectorTCPServer::Client
+    {
 public:
     class Client {
     public:
@@ -73,6 +84,10 @@ public:
         virtual void requestAutomationSession(const String& sessionIdentifier) = 0;
     };
 
+    // TCPPlist
+    static wi_status receivedPList(wi_t self, const plist_t rpc_dict);
+    void processReceivedPList(PList::Dictionary * dict);
+    void clientConnectionDied();
     static void startDisabled();
     static RemoteInspector& singleton();
     friend class NeverDestroyed<RemoteInspector>;
@@ -113,6 +128,13 @@ public:
 #endif
 
 private:
+        // TCPPList
+        void setupTCPServerIfNeeded();
+        std::shared_ptr<RemoteInspectorTCPServer> m_tcpServer;
+        void receivedSetupMessage(PList::Dictionary *userInfo);
+        void receivedDataMessage(PList::Dictionary *userInfo);
+        void receivedDidCloseMessage(PList::Dictionary *userInfo);
+        void receivedGetListingMessage(PList::Dictionary *userInfo);
     RemoteInspector();
 
     unsigned nextAvailableTargetIdentifier();
@@ -205,7 +227,9 @@ private:
     bool m_automaticInspectionEnabled { false };
     bool m_automaticInspectionPaused { false };
     unsigned m_automaticInspectionCandidateTargetIdentifier { 0 };
-};
+
+
+    };
 
 } // namespace Inspector
 

@@ -265,6 +265,7 @@ inline bool scribbleFreeCells()
 
 inline bool isScribbledValue(JSValue value)
 {
+//    return false;
     return JSValue::encode(value) == JSValue::encode(bitwise_cast<JSCell*>(SCRIBBLE_WORD));
 }
 

@@ -45,10 +45,21 @@ set(JavaScriptCore_INCLUDE_DIRECTORIES
 
 set(JavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES
     "${ICU_INCLUDE_DIRS}"
+        "${PLIST_INCLUDE_DIRS}"
 )
 
 set(JavaScriptCore_SOURCES
-    API/JSBase.cpp
+        inspector/remote/tcpplist/RemoteInspectorTCPPlist.cpp
+        inspector/remote/RemoteInspector.cpp
+        inspector/remote/tcpplist/RemoteConnectionToTargetTCPPlist.cpp
+        inspector/remote/tcpplist/RemoteInspectorTCPServer.cpp
+        inspector/remote/tcpplist/char_buffer.c
+        inspector/remote/tcpplist/webinspector.c
+        inspector/remote/RemoteAutomationTarget.cpp
+        inspector/remote/RemoteControllableTarget.cpp
+        inspector/remote/RemoteInspectionTarget.cpp
+        API/JSRemoteInspector.cpp
+        API/JSBase.cpp
     API/JSCTestRunnerUtils.cpp
     API/JSCallbackConstructor.cpp
     API/JSCallbackFunction.cpp
@@ -1064,7 +1075,9 @@ set(JavaScriptCore_LIBRARIES
     WTF${DEBUG_SUFFIX}
     ${ICU_I18N_LIBRARIES}
     ${LLVM_LIBRARIES}
-)
+        ${PLIST_LIBRARIES}
+        ${PLISTXX_LIBRARIES}
+        )
 
 set(JavaScriptCore_SCRIPTS_SOURCES_DIR "${JAVASCRIPTCORE_DIR}/Scripts")
 
@@ -1574,3 +1587,5 @@ if (MSVC)
         COMMAND ${PERL_EXECUTABLE} ${WEBKIT_LIBRARIES_DIR}/tools/scripts/version-stamp.pl ${DERIVED_SOURCES_DIR} $<TARGET_FILE:JavaScriptCore>
         VERBATIM)
 endif ()
+
+

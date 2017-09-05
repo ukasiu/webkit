@@ -60,7 +60,7 @@ public:
     // RemoteControllableTarget overrides.
     bool remoteControlAllowed() const override;
 private:
-    bool m_allowed {false};
+    bool m_allowed { false }; //todo
 #if USE(CF)
     RetainPtr<CFRunLoopRef> m_runLoop;
 #endif
